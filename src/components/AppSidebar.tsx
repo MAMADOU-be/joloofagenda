@@ -1,12 +1,6 @@
 import { LayoutDashboard, Users, Briefcase, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-
-const NAV_ITEMS = [
-  { to: '/', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { to: '/prospects', icon: Users, label: 'Prospects' },
-  { to: '/clients', icon: Briefcase, label: 'Clients' },
-  { to: '/parametres', icon: Settings, label: 'Paramètres' },
-];
+import { useI18n } from '@/lib/i18n';
 
 interface AppSidebarProps {
   signedCount: number;
@@ -16,7 +10,15 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle }: AppSidebarProps) {
+  const { t } = useI18n();
   const progress = monthlyGoal > 0 ? Math.min((signedCount / monthlyGoal) * 100, 100) : 0;
+
+  const NAV_ITEMS = [
+    { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { to: '/prospects', icon: Users, label: t('nav.prospects') },
+    { to: '/clients', icon: Briefcase, label: t('nav.clients') },
+    { to: '/parametres', icon: Settings, label: t('nav.settings') },
+  ];
 
   return (
     <aside className={`${collapsed ? 'w-16' : 'w-64'} border-r border-border bg-card flex flex-col transition-all duration-300 shrink-0`}>
@@ -49,11 +51,11 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle }: Ap
 
       {!collapsed && (
         <div className="m-3 p-4 bg-muted rounded-xl border border-border">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-2">Objectif Mensuel</p>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-2">{t('sidebar.monthlyGoal')}</p>
           <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
             <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
-          <p className="text-xs mt-2 font-medium text-foreground">{signedCount} / {monthlyGoal} Signatures</p>
+          <p className="text-xs mt-2 font-medium text-foreground">{signedCount} / {monthlyGoal} {t('sidebar.signatures')}</p>
         </div>
       )}
     </aside>
