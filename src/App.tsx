@@ -51,6 +51,7 @@ const App = () => {
   const clients = prospects.filter(p => p.status === 'SIGNED');
 
   return (
+    <I18nProvider>
     <BrowserRouter>
       <Toaster />
       <Sonner />
