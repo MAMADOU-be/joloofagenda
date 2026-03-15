@@ -13,6 +13,7 @@ import Clients from '@/pages/Clients';
 import SettingsPage from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
 import { Prospect } from '@/lib/types';
+import { I18nProvider } from '@/lib/i18n';
 
 const App = () => {
   const { prospects, addProspect, updateProspect, updateStatus, addActivity, exportToCSV } = useProspects();
@@ -50,6 +51,7 @@ const App = () => {
   const clients = prospects.filter(p => p.status === 'SIGNED');
 
   return (
+    <I18nProvider>
     <BrowserRouter>
       <Toaster />
       <Sonner />
@@ -94,6 +96,7 @@ const App = () => {
         )}
       </AnimatePresence>
     </BrowserRouter>
+    </I18nProvider>
   );
 };
 
