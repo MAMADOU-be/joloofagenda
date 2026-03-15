@@ -96,6 +96,7 @@ const App = () => {
         )}
       </AnimatePresence>
     </BrowserRouter>
+    </I18nProvider>
   );
 };
 
