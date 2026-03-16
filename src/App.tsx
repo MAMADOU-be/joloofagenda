@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AppSidebar } from '@/components/AppSidebar';
@@ -83,18 +82,16 @@ const App = () => {
         </main>
       </div>
 
-      <AnimatePresence>
-        {isModalOpen && <AddProspectModal onClose={() => setIsModalOpen(false)} onAdd={(data) => { addProspect(data); setIsModalOpen(false); }} />}
-        {selectedProspect && (
-          <ProspectDetail
-            prospect={selectedProspect}
-            onClose={() => setSelectedProspect(null)}
-            onUpdateStatus={updateStatus}
-            onUpdateProspect={updateProspect}
-            onAddActivity={addActivity}
-          />
-        )}
-      </AnimatePresence>
+      {isModalOpen && <AddProspectModal onClose={() => setIsModalOpen(false)} onAdd={(data) => { addProspect(data); setIsModalOpen(false); }} />}
+      {selectedProspect && (
+        <ProspectDetail
+          prospect={selectedProspect}
+          onClose={() => setSelectedProspect(null)}
+          onUpdateStatus={updateStatus}
+          onUpdateProspect={updateProspect}
+          onAddActivity={addActivity}
+        />
+      )}
     </BrowserRouter>
     </I18nProvider>
   );
