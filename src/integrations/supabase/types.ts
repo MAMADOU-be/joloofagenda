@@ -14,7 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          prospect_id: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          prospect_id: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          prospect_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospects: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          demo_link: string
+          id: string
+          name: string
+          notes: string
+          phone: string
+          proposed_price: string
+          rating: string
+          renewal_date: string
+          review_count: string
+          sector: string
+          signed_date: string
+          source: string
+          status: string
+          updated_at: string
+          website_url: string
+        }
+        Insert: {
+          address?: string
+          city?: string
+          created_at?: string
+          demo_link?: string
+          id?: string
+          name: string
+          notes?: string
+          phone?: string
+          proposed_price?: string
+          rating?: string
+          renewal_date?: string
+          review_count?: string
+          sector: string
+          signed_date?: string
+          source?: string
+          status?: string
+          updated_at?: string
+          website_url?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          demo_link?: string
+          id?: string
+          name?: string
+          notes?: string
+          phone?: string
+          proposed_price?: string
+          rating?: string
+          renewal_date?: string
+          review_count?: string
+          sector?: string
+          signed_date?: string
+          source?: string
+          status?: string
+          updated_at?: string
+          website_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
