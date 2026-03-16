@@ -61,9 +61,64 @@ export function useProspects() {
     setLoading(false);
   }, []);
 
+  // Migrate localStorage data to Supabase on first load
+  const migrateLocalStorage = useCallback(async () => {
+    const STORAGE_KEY = 'artisan_prospects';
+    const MIGRATED_KEY = 'artisan_prospects_migrated';
+    
+    if (localStorage.getItem(MIGRATED_KEY)) return;
+    
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      
+      const localProspects = JSON.parse(saved) as Prospect[];
+      if (!localProspects.length) return;
+
+      for (const p of localProspects) {
+        const { data: inserted } = await supabase
+          .from('prospects')
+          .insert({
+            name: p.name,
+            sector: p.sector,
+            address: p.address || '',
+            city: p.city || '',
+            phone: p.phone || '',
+            rating: p.rating || '',
+            review_count: p.reviewCount || '',
+            notes: p.notes || '',
+            source: p.source || 'Autre',
+            status: p.status || 'PROSPECT',
+            demo_link: p.demoLink || '',
+            proposed_price: p.proposedPrice || '',
+            website_url: p.websiteUrl || '',
+            renewal_date: p.renewalDate || '',
+            signed_date: p.signedDate || '',
+          })
+          .select()
+          .single();
+
+        if (inserted && p.activities?.length) {
+          await supabase.from('activities').insert(
+            p.activities.map(a => ({
+              prospect_id: inserted.id,
+              text: a.text,
+              date: a.date,
+            }))
+          );
+        }
+      }
+
+      localStorage.setItem(MIGRATED_KEY, 'true');
+      console.log(`Migrated ${localProspects.length} prospects from localStorage`);
+    } catch (e) {
+      console.error('Migration error:', e);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchProspects();
-  }, [fetchProspects]);
+    migrateLocalStorage().then(() => fetchProspects());
+  }, [migrateLocalStorage, fetchProspects]);
 
   const addProspect = useCallback(async (data: Omit<Prospect, 'id' | 'status' | 'createdAt' | 'activities' | 'demoLink' | 'proposedPrice' | 'websiteUrl' | 'renewalDate' | 'signedDate'>) => {
     const { data: inserted, error } = await supabase
