@@ -1,25 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Prospect, ProspectStatus, Activity } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export function useProspects() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Load prospects from DB
   const fetchProspects = useCallback(async () => {
+    if (!user) { setProspects([]); setLoading(false); return; }
+
     const { data: prospectRows, error } = await supabase
       .from('prospects')
       .select('*')
+      .or(`user_id.eq.${user.id},user_id.is.null`)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching prospects:', error);
-      setLoading(false);
-      return;
-    }
+    if (error) { console.error('Error fetching prospects:', error); setLoading(false); return; }
 
-    // Fetch activities for all prospects
     const ids = (prospectRows || []).map(p => p.id);
     let activitiesMap: Record<string, Activity[]> = {};
 
@@ -37,121 +36,74 @@ export function useProspects() {
     }
 
     const mapped: Prospect[] = (prospectRows || []).map(p => ({
-      id: p.id,
-      name: p.name,
-      sector: p.sector as Prospect['sector'],
-      address: p.address || '',
-      city: p.city || '',
-      phone: p.phone || '',
-      rating: p.rating || '',
-      reviewCount: p.review_count || '',
-      notes: p.notes || '',
-      source: p.source as Prospect['source'],
-      status: p.status as ProspectStatus,
-      createdAt: p.created_at,
-      activities: activitiesMap[p.id] || [],
-      demoLink: p.demo_link || '',
-      proposedPrice: p.proposed_price || '',
-      websiteUrl: p.website_url || '',
-      renewalDate: p.renewal_date || '',
+      id: p.id, name: p.name, sector: p.sector as Prospect['sector'],
+      address: p.address || '', city: p.city || '', phone: p.phone || '',
+      rating: p.rating || '', reviewCount: p.review_count || '', notes: p.notes || '',
+      source: p.source as Prospect['source'], status: p.status as ProspectStatus,
+      createdAt: p.created_at, activities: activitiesMap[p.id] || [],
+      demoLink: p.demo_link || '', proposedPrice: p.proposed_price || '',
+      websiteUrl: p.website_url || '', renewalDate: p.renewal_date || '',
       signedDate: p.signed_date || '',
     }));
 
     setProspects(mapped);
     setLoading(false);
-  }, []);
+  }, [user]);
 
-  // Migrate localStorage data to Supabase on first load
+  // Migrate localStorage data and claim for current user
   const migrateLocalStorage = useCallback(async () => {
-    const STORAGE_KEY = 'artisan_prospects';
+    if (!user) return;
     const MIGRATED_KEY = 'artisan_prospects_migrated';
-    
     if (localStorage.getItem(MIGRATED_KEY)) return;
-    
+
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return;
-      
+      const saved = localStorage.getItem('artisan_prospects');
+      if (!saved) { localStorage.setItem(MIGRATED_KEY, 'true'); return; }
       const localProspects = JSON.parse(saved) as Prospect[];
-      if (!localProspects.length) return;
+      if (!localProspects.length) { localStorage.setItem(MIGRATED_KEY, 'true'); return; }
 
       for (const p of localProspects) {
-        const { data: inserted } = await supabase
-          .from('prospects')
-          .insert({
-            name: p.name,
-            sector: p.sector,
-            address: p.address || '',
-            city: p.city || '',
-            phone: p.phone || '',
-            rating: p.rating || '',
-            review_count: p.reviewCount || '',
-            notes: p.notes || '',
-            source: p.source || 'Autre',
-            status: p.status || 'PROSPECT',
-            demo_link: p.demoLink || '',
-            proposed_price: p.proposedPrice || '',
-            website_url: p.websiteUrl || '',
-            renewal_date: p.renewalDate || '',
-            signed_date: p.signedDate || '',
-          })
-          .select()
-          .single();
+        const { data: inserted } = await supabase.from('prospects').insert({
+          user_id: user.id, name: p.name, sector: p.sector,
+          address: p.address || '', city: p.city || '', phone: p.phone || '',
+          rating: p.rating || '', review_count: p.reviewCount || '', notes: p.notes || '',
+          source: p.source || 'Autre', status: p.status || 'PROSPECT',
+          demo_link: p.demoLink || '', proposed_price: p.proposedPrice || '',
+          website_url: p.websiteUrl || '', renewal_date: p.renewalDate || '',
+          signed_date: p.signedDate || '',
+        }).select().single();
 
         if (inserted && p.activities?.length) {
           await supabase.from('activities').insert(
-            p.activities.map(a => ({
-              prospect_id: inserted.id,
-              text: a.text,
-              date: a.date,
-            }))
+            p.activities.map(a => ({ prospect_id: inserted.id, user_id: user.id, text: a.text, date: a.date }))
           );
         }
       }
-
       localStorage.setItem(MIGRATED_KEY, 'true');
-      console.log(`Migrated ${localProspects.length} prospects from localStorage`);
-    } catch (e) {
-      console.error('Migration error:', e);
-    }
-  }, []);
+    } catch (e) { console.error('Migration error:', e); }
+  }, [user]);
 
   useEffect(() => {
-    migrateLocalStorage().then(() => fetchProspects());
-  }, [migrateLocalStorage, fetchProspects]);
+    if (user) {
+      migrateLocalStorage().then(() => fetchProspects());
+    }
+  }, [user, migrateLocalStorage, fetchProspects]);
 
   const addProspect = useCallback(async (data: Omit<Prospect, 'id' | 'status' | 'createdAt' | 'activities' | 'demoLink' | 'proposedPrice' | 'websiteUrl' | 'renewalDate' | 'signedDate'>) => {
-    const { data: inserted, error } = await supabase
-      .from('prospects')
-      .insert({
-        name: data.name,
-        sector: data.sector,
-        address: data.address,
-        city: data.city,
-        phone: data.phone,
-        rating: data.rating,
-        review_count: data.reviewCount,
-        notes: data.notes,
-        source: data.source,
-        status: 'PROSPECT',
-      })
-      .select()
-      .single();
+    if (!user) return null;
+    const { data: inserted, error } = await supabase.from('prospects').insert({
+      user_id: user.id, name: data.name, sector: data.sector,
+      address: data.address, city: data.city, phone: data.phone,
+      rating: data.rating, review_count: data.reviewCount,
+      notes: data.notes, source: data.source, status: 'PROSPECT',
+    }).select().single();
 
-    if (error || !inserted) {
-      console.error('Error adding prospect:', error);
-      return null;
-    }
+    if (error || !inserted) { console.error('Error adding prospect:', error); return null; }
 
-    // Add initial activity
-    await supabase.from('activities').insert({
-      prospect_id: inserted.id,
-      text: 'Prospect ajouté au système',
-    });
-
+    await supabase.from('activities').insert({ prospect_id: inserted.id, user_id: user.id, text: 'Prospect ajouté au système' });
     await fetchProspects();
     return inserted;
-  }, [fetchProspects]);
+  }, [user, fetchProspects]);
 
   const updateProspect = useCallback(async (id: string, updates: Partial<Prospect>) => {
     const dbUpdates: Record<string, unknown> = {};
@@ -170,46 +122,35 @@ export function useProspects() {
     if (updates.websiteUrl !== undefined) dbUpdates.website_url = updates.websiteUrl;
     if (updates.renewalDate !== undefined) dbUpdates.renewal_date = updates.renewalDate;
     if (updates.signedDate !== undefined) dbUpdates.signed_date = updates.signedDate;
-
     await supabase.from('prospects').update(dbUpdates).eq('id', id);
     await fetchProspects();
   }, [fetchProspects]);
 
   const updateStatus = useCallback(async (id: string, newStatus: ProspectStatus) => {
+    if (!user) return;
     const updates: Record<string, unknown> = { status: newStatus };
     if (newStatus === 'SIGNED') updates.signed_date = new Date().toISOString();
-
     await supabase.from('prospects').update(updates).eq('id', id);
 
     const statusLabel = newStatus === 'PROSPECT' ? 'Prospect' : newStatus === 'CONTACTED' ? 'Contacté' : newStatus === 'DEMO' ? 'Démo envoyée' : newStatus === 'SIGNED' ? 'Signé' : 'Refus';
-    await supabase.from('activities').insert({
-      prospect_id: id,
-      text: `Statut changé en ${statusLabel}`,
-    });
-
+    await supabase.from('activities').insert({ prospect_id: id, user_id: user.id, text: `Statut changé en ${statusLabel}` });
     await fetchProspects();
-  }, [fetchProspects]);
+  }, [user, fetchProspects]);
 
   const addActivity = useCallback(async (id: string, text: string) => {
-    await supabase.from('activities').insert({
-      prospect_id: id,
-      text,
-    });
+    if (!user) return;
+    await supabase.from('activities').insert({ prospect_id: id, user_id: user.id, text });
     await fetchProspects();
-  }, [fetchProspects]);
+  }, [user, fetchProspects]);
 
   const exportToCSV = useCallback(() => {
     const headers = "Nom,Secteur,Ville,Téléphone,Statut,Note Google,Date\n";
-    const rows = prospects.map(p =>
-      `"${p.name}","${p.sector}","${p.city}","${p.phone}","${p.status}","${p.rating}","${p.createdAt}"`
-    ).join("\n");
+    const rows = prospects.map(p => `"${p.name}","${p.sector}","${p.city}","${p.phone}","${p.status}","${p.rating}","${p.createdAt}"`).join("\n");
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const a = document.createElement('a'); a.href = url;
     a.download = `prospects_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    a.click(); window.URL.revokeObjectURL(url);
   }, [prospects]);
 
   return { prospects, loading, addProspect, updateProspect, updateStatus, addActivity, exportToCSV };

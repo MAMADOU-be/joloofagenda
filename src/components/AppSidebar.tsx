@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Briefcase, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, Settings, CalendarDays, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 
@@ -7,9 +7,11 @@ interface AppSidebarProps {
   monthlyGoal: number;
   collapsed: boolean;
   onToggle: () => void;
+  onSignOut?: () => void;
+  userEmail?: string;
 }
 
-export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle }: AppSidebarProps) {
+export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSignOut, userEmail }: AppSidebarProps) {
   const { t } = useI18n();
   const progress = monthlyGoal > 0 ? Math.min((signedCount / monthlyGoal) * 100, 100) : 0;
 
@@ -17,6 +19,7 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle }: Ap
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
     { to: '/prospects', icon: Users, label: t('nav.prospects') },
     { to: '/clients', icon: Briefcase, label: t('nav.clients') },
+    { to: '/rendez-vous', icon: CalendarDays, label: t('nav.appointments') },
     { to: '/parametres', icon: Settings, label: t('nav.settings') },
   ];
 
@@ -58,6 +61,19 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle }: Ap
           <p className="text-xs mt-2 font-medium text-foreground">{signedCount} / {monthlyGoal} {t('sidebar.signatures')}</p>
         </div>
       )}
+
+      {/* User + logout */}
+      <div className="border-t border-border p-3">
+        {!collapsed && userEmail && (
+          <p className="text-xs text-muted-foreground truncate mb-2 px-1">{userEmail}</p>
+        )}
+        {onSignOut && (
+          <button onClick={onSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full">
+            <LogOut size={18} className="shrink-0" />
+            {!collapsed && <span>Déconnexion</span>}
+          </button>
+        )}
+      </div>
     </aside>
   );
 }

@@ -21,6 +21,7 @@ export type Database = {
           id: string
           prospect_id: string
           text: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           prospect_id: string
           text: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           prospect_id?: string
           text?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -45,6 +48,80 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      appointments: {
+        Row: {
+          created_at: string
+          date: string
+          description: string
+          duration_minutes: number
+          id: string
+          location: string
+          prospect_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          location?: string
+          prospect_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          location?: string
+          prospect_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string
+          created_at?: string
+          full_name?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       prospects: {
         Row: {
@@ -65,6 +142,7 @@ export type Database = {
           source: string
           status: string
           updated_at: string
+          user_id: string | null
           website_url: string
         }
         Insert: {
@@ -85,6 +163,7 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
           website_url?: string
         }
         Update: {
@@ -105,6 +184,7 @@ export type Database = {
           source?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
           website_url?: string
         }
         Relationships: []

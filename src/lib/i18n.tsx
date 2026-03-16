@@ -14,6 +14,7 @@ const translations = {
   'nav.prospects': { fr: 'Prospects', en: 'Prospects', nl: 'Prospecten' },
   'nav.clients': { fr: 'Clients', en: 'Clients', nl: 'Klanten' },
   'nav.settings': { fr: 'Paramètres', en: 'Settings', nl: 'Instellingen' },
+  'nav.appointments': { fr: 'Rendez-vous', en: 'Appointments', nl: 'Afspraken' },
   'sidebar.monthlyGoal': { fr: 'Objectif Mensuel', en: 'Monthly Goal', nl: 'Maanddoel' },
   'sidebar.signatures': { fr: 'Signatures', en: 'Signatures', nl: 'Handtekeningen' },
 
