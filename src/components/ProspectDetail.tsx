@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { X, Phone, MapPin, Briefcase, Star, Link, Euro, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Prospect, ProspectStatus, STATUSES } from '@/lib/types';
 import { StatusBadge } from './StatusBadge';
 import { useI18n } from '@/lib/i18n';
@@ -30,13 +29,9 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-foreground/20 backdrop-blur-[2px]" onClick={onClose}>
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full max-w-xl bg-card h-full shadow-2xl flex flex-col"
+    <div className="fixed inset-0 z-50 flex justify-end bg-foreground/20 backdrop-blur-[2px] animate-fade-in" onClick={onClose}>
+      <div
+        className="w-full max-w-xl bg-card h-full shadow-2xl flex flex-col animate-slide-in-right"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6 border-b border-border flex justify-between items-center">
@@ -143,7 +138,7 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
             <Briefcase size={16} /> {t('detail.markClient')}
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
