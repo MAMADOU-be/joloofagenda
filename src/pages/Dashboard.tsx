@@ -1,6 +1,5 @@
 import { Users, MessageSquare, ExternalLink, Briefcase, X, TrendingUp, Plus } from 'lucide-react';
 import { Prospect } from '@/lib/types';
-import { Prospect } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 
