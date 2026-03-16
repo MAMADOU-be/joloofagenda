@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AppSidebar } from '@/components/AppSidebar';
 import { AddProspectModal } from '@/components/AddProspectModal';
