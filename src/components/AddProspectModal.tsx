@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Sector, Source, SECTORS, SOURCES } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 
@@ -36,12 +35,9 @@ export function AddProspectModal({ onClose, onAdd }: AddProspectModalProps) {
   const set = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/40 backdrop-blur-sm" onClick={onClose}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div
+        className="bg-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-modal-in"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6 border-b border-border flex justify-between items-center">
@@ -103,7 +99,7 @@ export function AddProspectModal({ onClose, onAdd }: AddProspectModalProps) {
             {t('modal.submit')}
           </button>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 }

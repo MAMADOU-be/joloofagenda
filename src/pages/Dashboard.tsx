@@ -1,5 +1,4 @@
 import { Users, MessageSquare, ExternalLink, Briefcase, X, TrendingUp, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Prospect } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
@@ -72,13 +71,11 @@ export default function Dashboard({ prospects, onOpenAdd }: DashboardProps) {
               const pct = stats.total > 0 ? (item.val / stats.total) * 100 : 0;
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-3">
-                  <div className="w-full h-48 flex items-end">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${Math.max(pct, 2)}%` }}
-                      transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className={`${item.className} rounded-t-lg w-full opacity-80 hover:opacity-100 transition-opacity`}
-                    />
+                    <div className="w-full h-48 flex items-end">
+                      <div
+                        style={{ '--bar-height': `${Math.max(pct, 2)}%`, animationDelay: `${i * 0.1}s` } as React.CSSProperties}
+                        className={`${item.className} rounded-t-lg w-full opacity-80 hover:opacity-100 transition-opacity animate-grow-up`}
+                      />
                   </div>
                   <div className="text-center">
                     <span className="text-lg font-bold tabular-nums text-foreground">{item.val}</span>
