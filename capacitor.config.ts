@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.3691094f78c94e72beb4544987be3db3',
+  appId: 'app.lovable.joloofagenda',
   appName: 'joloofagenda',
   webDir: 'dist',
   server: {
