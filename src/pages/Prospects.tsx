@@ -42,14 +42,14 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
   }, [prospects, search, statusFilter, sectorFilter, sortBy]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-foreground">{t('prospects.title')}</h1>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex justify-between items-center gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('prospects.title')}</h1>
         <button
           onClick={onOpenAdd}
-          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-opacity shadow-sm"
+          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-3 md:px-4 py-2 rounded-lg flex items-center gap-1.5 md:gap-2 transition-opacity shadow-sm shrink-0"
         >
-          <Plus size={16} /> {t('dashboard.add')}
+          <Plus size={16} /> <span className="hidden sm:inline">{t('dashboard.add')}</span>
         </button>
       </div>
 
@@ -104,7 +104,7 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
         )}
 
         {viewMode === 'table' && (
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-muted/50 text-[11px] uppercase tracking-wider font-bold text-muted-foreground border-b border-border">
@@ -154,8 +154,9 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
           </div>
         )}
 
-        {viewMode === 'card' && (
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Card view: always shown on mobile, toggle on desktop */}
+        {(viewMode === 'card' || true) && (
+          <div className={`p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
             {filtered.map(p => (
               <div key={p.id} onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all group">
                 <div className="flex justify-between items-start mb-3">

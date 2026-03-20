@@ -10,14 +10,14 @@ interface DashboardProps {
 
 function StatCard({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
-    <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-2 bg-muted rounded-lg border border-border">
-          <Icon size={20} className="text-primary" />
+    <div className="bg-card p-4 md:p-5 rounded-xl border border-border shadow-sm">
+      <div className="flex justify-between items-start mb-3 md:mb-4">
+        <div className="p-1.5 md:p-2 bg-muted rounded-lg border border-border">
+          <Icon size={18} className="text-primary" />
         </div>
       </div>
-      <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">{value}</div>
-      <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{label}</div>
+      <div className="text-xl md:text-2xl font-bold tracking-tight text-foreground tabular-nums">{value}</div>
+      <div className="text-[10px] md:text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">{label}</div>
     </div>
   );
 }
@@ -41,14 +41,14 @@ export default function Dashboard({ prospects, onOpenAdd }: DashboardProps) {
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
+    <div className="space-y-6 md:space-y-8">
+      <div className="flex justify-between items-center gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
         <button
           onClick={onOpenAdd}
-          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-opacity shadow-sm"
+          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-3 md:px-4 py-2 rounded-lg flex items-center gap-1.5 md:gap-2 transition-opacity shadow-sm shrink-0"
         >
-          <Plus size={16} /> {t('dashboard.add')}
+          <Plus size={16} /> <span className="hidden sm:inline">{t('dashboard.add')}</span>
           <kbd className="hidden md:inline-block ml-1 opacity-50 text-[10px] border border-primary-foreground/30 px-1 rounded">N</kbd>
         </button>
       </div>
@@ -66,7 +66,7 @@ export default function Dashboard({ prospects, onOpenAdd }: DashboardProps) {
           <h3 className="font-bold text-foreground mb-6 flex items-center gap-2">
             <TrendingUp size={18} className="text-primary" /> {t('dashboard.funnel')}
           </h3>
-          <div className="flex items-end gap-3 h-48">
+          <div className="flex items-end gap-2 md:gap-3 h-36 md:h-48">
             {funnelData.map((item, i) => {
               const pct = stats.total > 0 ? (item.val / stats.total) * 100 : 0;
               return (

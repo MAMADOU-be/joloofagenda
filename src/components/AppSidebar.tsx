@@ -1,6 +1,7 @@
-import { LayoutDashboard, Users, Briefcase, Settings, CalendarDays, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, Settings, CalendarDays, LogOut, Menu, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
+import { useState, useEffect } from 'react';
 
 interface AppSidebarProps {
   signedCount: number;
@@ -13,7 +14,15 @@ interface AppSidebarProps {
 
 export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSignOut, userEmail }: AppSidebarProps) {
   const { t } = useI18n();
+  const [mobileOpen, setMobileOpen] = useState(false);
   const progress = monthlyGoal > 0 ? Math.min((signedCount / monthlyGoal) * 100, 100) : 0;
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    const handler = () => setMobileOpen(false);
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
 
   const NAV_ITEMS = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
@@ -23,13 +32,23 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSi
     { to: '/parametres', icon: Settings, label: t('nav.settings') },
   ];
 
-  return (
-    <aside className={`${collapsed ? 'w-16' : 'w-64'} border-r border-border bg-card flex flex-col transition-all duration-300 shrink-0`}>
-      <div className="flex items-center gap-2 px-4 h-16 border-b border-border">
-        <button onClick={onToggle} className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
-          A
+  const sidebarContent = (
+    <>
+      <div className="flex items-center justify-between px-4 h-14 md:h-16 border-b border-border">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
+            A
+          </div>
+          {(!collapsed || mobileOpen) && <span className="font-bold tracking-tight text-lg text-foreground">L'Artisan</span>}
+        </div>
+        {/* Close button on mobile */}
+        <button onClick={() => setMobileOpen(false)} className="md:hidden p-1 text-muted-foreground hover:text-foreground">
+          <X size={20} />
         </button>
-        {!collapsed && <span className="font-bold tracking-tight text-lg text-foreground">L'Artisan</span>}
+        {/* Collapse button on desktop */}
+        <button onClick={onToggle} className="hidden md:block p-1 text-muted-foreground hover:text-foreground">
+          <Menu size={18} />
+        </button>
       </div>
 
       <nav className="flex-1 p-3 space-y-1">
@@ -38,6 +57,7 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSi
             key={item.to}
             to={item.to}
             end={item.to === '/'}
+            onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
                 isActive
@@ -47,12 +67,12 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSi
             }
           >
             <item.icon size={18} className="shrink-0" />
-            {!collapsed && <span>{item.label}</span>}
+            {(!collapsed || mobileOpen) && <span>{item.label}</span>}
           </NavLink>
         ))}
       </nav>
 
-      {!collapsed && (
+      {(!collapsed || mobileOpen) && (
         <div className="m-3 p-4 bg-muted rounded-xl border border-border">
           <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-2">{t('sidebar.monthlyGoal')}</p>
           <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
@@ -62,18 +82,45 @@ export function AppSidebar({ signedCount, monthlyGoal, collapsed, onToggle, onSi
         </div>
       )}
 
-      {/* User + logout */}
       <div className="border-t border-border p-3">
-        {!collapsed && userEmail && (
+        {(!collapsed || mobileOpen) && userEmail && (
           <p className="text-xs text-muted-foreground truncate mb-2 px-1">{userEmail}</p>
         )}
         {onSignOut && (
           <button onClick={onSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full">
             <LogOut size={18} className="shrink-0" />
-            {!collapsed && <span>Déconnexion</span>}
+            {(!collapsed || mobileOpen) && <span>Déconnexion</span>}
           </button>
         )}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-card border-b border-border flex items-center px-4 gap-3">
+        <button onClick={() => setMobileOpen(true)} className="p-1.5 text-foreground">
+          <Menu size={22} />
+        </button>
+        <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xs">A</div>
+        <span className="font-bold text-foreground">L'Artisan</span>
+      </div>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+          <aside className="relative w-72 max-w-[85vw] bg-card flex flex-col shadow-xl animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className={`hidden md:flex ${collapsed ? 'w-16' : 'w-64'} border-r border-border bg-card flex-col transition-all duration-300 shrink-0`}>
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
