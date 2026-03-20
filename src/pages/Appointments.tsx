@@ -48,7 +48,17 @@ export default function Appointments() {
     setAppointments((appts || []).map(a => ({ ...a, prospect_name: a.prospect_id ? prospectMap.get(a.prospect_id) : undefined })));
   }, [user]);
 
+  const { scheduleReminders } = useNotifications();
+
   useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  // Schedule push notifications for upcoming appointments
+  useEffect(() => {
+    if (appointments.length > 0) {
+      const upcoming = appointments.filter(a => new Date(a.date) > new Date());
+      scheduleReminders(upcoming);
+    }
+  }, [appointments, scheduleReminders]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
