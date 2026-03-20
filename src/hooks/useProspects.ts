@@ -106,6 +106,8 @@ export function useProspects() {
   }, [user, fetchProspects]);
 
   const updateProspect = useCallback(async (id: string, updates: Partial<Prospect>) => {
+    if (!user) return;
+    await claimProspect(id);
     const dbUpdates: Record<string, unknown> = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.sector !== undefined) dbUpdates.sector = updates.sector;
@@ -124,7 +126,7 @@ export function useProspects() {
     if (updates.signedDate !== undefined) dbUpdates.signed_date = updates.signedDate;
     await supabase.from('prospects').update(dbUpdates).eq('id', id);
     await fetchProspects();
-  }, [fetchProspects]);
+  }, [user, claimProspect, fetchProspects]);
 
   const claimProspect = useCallback(async (id: string) => {
     if (!user) return;
