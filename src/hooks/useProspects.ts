@@ -105,6 +105,11 @@ export function useProspects() {
     return inserted;
   }, [user, fetchProspects]);
 
+  const claimProspect = useCallback(async (id: string) => {
+    if (!user) return;
+    await supabase.from('prospects').update({ user_id: user.id }).eq('id', id).is('user_id', null);
+  }, [user]);
+
   const updateProspect = useCallback(async (id: string, updates: Partial<Prospect>) => {
     if (!user) return;
     await claimProspect(id);
@@ -127,11 +132,6 @@ export function useProspects() {
     await supabase.from('prospects').update(dbUpdates).eq('id', id);
     await fetchProspects();
   }, [user, claimProspect, fetchProspects]);
-
-  const claimProspect = useCallback(async (id: string) => {
-    if (!user) return;
-    await supabase.from('prospects').update({ user_id: user.id }).eq('id', id).is('user_id', null);
-  }, [user]);
 
   const updateStatus = useCallback(async (id: string, newStatus: ProspectStatus) => {
     if (!user) return;
