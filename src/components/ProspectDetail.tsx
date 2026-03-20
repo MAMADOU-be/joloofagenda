@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { X, Phone, MapPin, Briefcase, Star, Link, Euro, Plus, ChevronDown } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { X, Phone, MapPin, Briefcase, Star, Link, Euro, Plus, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
 import { Prospect, ProspectStatus, STATUSES } from '@/lib/types';
 import { StatusBadge } from './StatusBadge';
 import { useI18n } from '@/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProspectDetailProps {
   prospect: Prospect;
