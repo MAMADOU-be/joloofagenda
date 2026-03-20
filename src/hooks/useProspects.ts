@@ -105,7 +105,14 @@ export function useProspects() {
     return inserted;
   }, [user, fetchProspects]);
 
+  const claimProspect = useCallback(async (id: string) => {
+    if (!user) return;
+    await supabase.from('prospects').update({ user_id: user.id }).eq('id', id).is('user_id', null);
+  }, [user]);
+
   const updateProspect = useCallback(async (id: string, updates: Partial<Prospect>) => {
+    if (!user) return;
+    await claimProspect(id);
     const dbUpdates: Record<string, unknown> = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.sector !== undefined) dbUpdates.sector = updates.sector;
@@ -124,18 +131,20 @@ export function useProspects() {
     if (updates.signedDate !== undefined) dbUpdates.signed_date = updates.signedDate;
     await supabase.from('prospects').update(dbUpdates).eq('id', id);
     await fetchProspects();
-  }, [fetchProspects]);
+  }, [user, claimProspect, fetchProspects]);
 
   const updateStatus = useCallback(async (id: string, newStatus: ProspectStatus) => {
     if (!user) return;
+    await claimProspect(id);
     const updates: Record<string, unknown> = { status: newStatus };
     if (newStatus === 'SIGNED') updates.signed_date = new Date().toISOString();
-    await supabase.from('prospects').update(updates).eq('id', id);
+    const { error } = await supabase.from('prospects').update(updates).eq('id', id);
+    if (error) { console.error('Error updating status:', error); return; }
 
     const statusLabel = newStatus === 'PROSPECT' ? 'Prospect' : newStatus === 'CONTACTED' ? 'Contacté' : newStatus === 'DEMO' ? 'Démo envoyée' : newStatus === 'SIGNED' ? 'Signé' : 'Refus';
     await supabase.from('activities').insert({ prospect_id: id, user_id: user.id, text: `Statut changé en ${statusLabel}` });
     await fetchProspects();
-  }, [user, fetchProspects]);
+  }, [user, claimProspect, fetchProspects]);
 
   const addActivity = useCallback(async (id: string, text: string) => {
     if (!user) return;
