@@ -104,7 +104,7 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
         )}
 
         {viewMode === 'table' && (
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-muted/50 text-[11px] uppercase tracking-wider font-bold text-muted-foreground border-b border-border">
