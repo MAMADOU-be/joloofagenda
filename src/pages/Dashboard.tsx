@@ -66,7 +66,7 @@ export default function Dashboard({ prospects, onOpenAdd }: DashboardProps) {
           <h3 className="font-bold text-foreground mb-6 flex items-center gap-2">
             <TrendingUp size={18} className="text-primary" /> {t('dashboard.funnel')}
           </h3>
-          <div className="flex items-end gap-3 h-48">
+          <div className="flex items-end gap-2 md:gap-3 h-36 md:h-48">
             {funnelData.map((item, i) => {
               const pct = stats.total > 0 ? (item.val / stats.total) * 100 : 0;
               return (
