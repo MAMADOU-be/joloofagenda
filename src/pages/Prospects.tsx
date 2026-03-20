@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Search, Download, Filter, MapPin, Users, Plus, Phone, MessageSquare } from 'lucide-react';
 import { Prospect, ProspectStatus, STATUSES, SECTORS, Sector } from '@/lib/types';
 import { StatusBadge } from '@/components/StatusBadge';
+import { SwipeableCard } from '@/components/SwipeableCard';
 import { useI18n } from '@/lib/i18n';
 
 interface ProspectsProps {
