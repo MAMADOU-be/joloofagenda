@@ -41,14 +41,14 @@ export default function Dashboard({ prospects, onOpenAdd }: DashboardProps) {
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
+    <div className="space-y-6 md:space-y-8">
+      <div className="flex justify-between items-center gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('dashboard.title')}</h1>
         <button
           onClick={onOpenAdd}
-          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-opacity shadow-sm"
+          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-3 md:px-4 py-2 rounded-lg flex items-center gap-1.5 md:gap-2 transition-opacity shadow-sm shrink-0"
         >
-          <Plus size={16} /> {t('dashboard.add')}
+          <Plus size={16} /> <span className="hidden sm:inline">{t('dashboard.add')}</span>
           <kbd className="hidden md:inline-block ml-1 opacity-50 text-[10px] border border-primary-foreground/30 px-1 rounded">N</kbd>
         </button>
       </div>
