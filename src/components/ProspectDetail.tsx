@@ -18,6 +18,24 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
   const [activityText, setActivityText] = useState('');
   const [demoLink, setDemoLink] = useState(prospect.demoLink);
   const [proposedPrice, setProposedPrice] = useState(prospect.proposedPrice);
+  const [suggestions, setSuggestions] = useState<{ icon: string; title: string; description: string }[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  const fetchSuggestions = useCallback(async () => {
+    setLoadingSuggestions(true);
+    setSuggestions([]);
+    try {
+      const { data, error } = await supabase.functions.invoke('suggest-followup', {
+        body: { prospect },
+      });
+      if (error) throw error;
+      setSuggestions(data?.suggestions || []);
+    } catch (e) {
+      console.error('AI suggestion error:', e);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  }, [prospect]);
 
   const handleAddActivity = () => {
     if (!activityText.trim()) return;
