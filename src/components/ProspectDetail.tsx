@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { X, Phone, MapPin, Briefcase, Star, Link, Euro, Plus, ChevronDown } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { X, Phone, MapPin, Briefcase, Star, Link, Euro, Plus, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
 import { Prospect, ProspectStatus, STATUSES } from '@/lib/types';
 import { StatusBadge } from './StatusBadge';
 import { useI18n } from '@/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProspectDetailProps {
   prospect: Prospect;
@@ -17,6 +18,24 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
   const [activityText, setActivityText] = useState('');
   const [demoLink, setDemoLink] = useState(prospect.demoLink);
   const [proposedPrice, setProposedPrice] = useState(prospect.proposedPrice);
+  const [suggestions, setSuggestions] = useState<{ icon: string; title: string; description: string }[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  const fetchSuggestions = useCallback(async () => {
+    setLoadingSuggestions(true);
+    setSuggestions([]);
+    try {
+      const { data, error } = await supabase.functions.invoke('suggest-followup', {
+        body: { prospect },
+      });
+      if (error) throw error;
+      setSuggestions(data?.suggestions || []);
+    } catch (e) {
+      console.error('AI suggestion error:', e);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  }, [prospect]);
 
   const handleAddActivity = () => {
     if (!activityText.trim()) return;
@@ -98,6 +117,41 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
               </button>
             ))}
           </div>
+        </section>
+
+        {/* AI Suggestions */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+              <Sparkles size={10} /> Suggestions IA
+            </p>
+            <button
+              onClick={fetchSuggestions}
+              disabled={loadingSuggestions}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-semibold active:opacity-70 transition-opacity disabled:opacity-50"
+            >
+              {loadingSuggestions ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+              {loadingSuggestions ? 'Analyse...' : 'Générer'}
+            </button>
+          </div>
+          {suggestions.length > 0 && (
+            <div className="space-y-2">
+              {suggestions.map((s, i) => (
+                <div key={i} className="flex gap-3 p-3 bg-primary/5 border border-primary/10 rounded-xl">
+                  <span className="text-lg shrink-0">{s.icon}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-foreground">{s.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{s.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {!loadingSuggestions && suggestions.length === 0 && (
+            <p className="text-xs text-muted-foreground text-center py-3">
+              Appuyez sur "Générer" pour obtenir des suggestions de suivi personnalisées
+            </p>
+          )}
         </section>
 
         {/* Activities */}
