@@ -119,6 +119,41 @@ export function ProspectDetail({ prospect, onClose, onUpdateStatus, onUpdatePros
           </div>
         </section>
 
+        {/* AI Suggestions */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+              <Sparkles size={10} /> Suggestions IA
+            </p>
+            <button
+              onClick={fetchSuggestions}
+              disabled={loadingSuggestions}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-semibold active:opacity-70 transition-opacity disabled:opacity-50"
+            >
+              {loadingSuggestions ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+              {loadingSuggestions ? 'Analyse...' : 'Générer'}
+            </button>
+          </div>
+          {suggestions.length > 0 && (
+            <div className="space-y-2">
+              {suggestions.map((s, i) => (
+                <div key={i} className="flex gap-3 p-3 bg-primary/5 border border-primary/10 rounded-xl">
+                  <span className="text-lg shrink-0">{s.icon}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-foreground">{s.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{s.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {!loadingSuggestions && suggestions.length === 0 && (
+            <p className="text-xs text-muted-foreground text-center py-3">
+              Appuyez sur "Générer" pour obtenir des suggestions de suivi personnalisées
+            </p>
+          )}
+        </section>
+
         {/* Activities */}
         <section>
           <p className="text-[10px] font-bold uppercase text-muted-foreground mb-3">{t('detail.activityHistory')}</p>
