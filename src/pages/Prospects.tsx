@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Download, Filter, ChevronRight, MapPin, Users, Plus, LayoutGrid, List, Phone, MessageSquare } from 'lucide-react';
+import { Search, Download, Filter, MapPin, Users, Plus, Phone, MessageSquare } from 'lucide-react';
 import { Prospect, ProspectStatus, STATUSES, SECTORS, Sector } from '@/lib/types';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useI18n } from '@/lib/i18n';
@@ -13,7 +13,6 @@ interface ProspectsProps {
 }
 
 type SortKey = 'date' | 'name' | 'status';
-type ViewMode = 'table' | 'card';
 
 export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, onUpdateStatus }: ProspectsProps) {
   const { t, locale } = useI18n();
@@ -21,7 +20,6 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
   const [statusFilter, setStatusFilter] = useState<ProspectStatus | ''>('');
   const [sectorFilter, setSectorFilter] = useState<Sector | ''>('');
   const [sortBy, setSortBy] = useState<SortKey>('date');
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [showFilters, setShowFilters] = useState(false);
 
   const filtered = useMemo(() => {
@@ -42,161 +40,105 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
   }, [prospects, search, statusFilter, sectorFilter, sortBy]);
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      <div className="flex justify-between items-center gap-3">
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('prospects.title')}</h1>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold text-foreground">{t('prospects.title')}</h1>
         <button
           onClick={onOpenAdd}
-          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-medium px-3 md:px-4 py-2 rounded-lg flex items-center gap-1.5 md:gap-2 transition-opacity shadow-sm shrink-0"
+          className="bg-primary hover:opacity-90 text-primary-foreground text-sm font-semibold w-10 h-10 rounded-full flex items-center justify-center transition-opacity shadow-lg shadow-primary/25"
         >
-          <Plus size={16} /> <span className="hidden sm:inline">{t('dashboard.add')}</span>
+          <Plus size={20} />
         </button>
       </div>
 
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-border flex flex-col md:flex-row gap-3 justify-between items-start md:items-center">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <input
-              type="text"
-              placeholder={t('prospects.search')}
-              className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <div className="flex rounded-lg border border-border overflow-hidden">
-              <button onClick={() => setViewMode('table')} className={`p-2 transition-colors ${viewMode === 'table' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted'}`}>
-                <List size={16} />
-              </button>
-              <button onClick={() => setViewMode('card')} className={`p-2 transition-colors ${viewMode === 'card' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted'}`}>
-                <LayoutGrid size={16} />
-              </button>
-            </div>
-            <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted border border-border rounded-lg transition-colors">
-              <Filter size={16} /> {t('prospects.filter')}
-            </button>
-            <button onClick={onExport} className="p-2 text-muted-foreground hover:bg-muted rounded-lg border border-border transition-colors" title="Export CSV">
-              <Download size={16} />
-            </button>
-          </div>
+      {/* Search + filters */}
+      <div className="space-y-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <input
+            type="text"
+            placeholder={t('prospects.search')}
+            className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
-
-        {showFilters && (
-          <div className="p-4 border-b border-border bg-muted/50 flex flex-wrap gap-3">
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as ProspectStatus | '')} className="px-3 py-1.5 bg-card border border-border rounded-lg text-sm text-foreground outline-none">
-              <option value="">{t('prospects.allStatuses')}</option>
-              {(Object.keys(STATUSES) as ProspectStatus[]).map(key => (
-                <option key={key} value={key}>{t(`status.${key}` as any)}</option>
-              ))}
-            </select>
-            <select value={sectorFilter} onChange={e => setSectorFilter(e.target.value as Sector | '')} className="px-3 py-1.5 bg-card border border-border rounded-lg text-sm text-foreground outline-none">
-              <option value="">{t('prospects.allSectors')}</option>
-              {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as SortKey)} className="px-3 py-1.5 bg-card border border-border rounded-lg text-sm text-foreground outline-none">
-              <option value="date">{t('prospects.sortDate')}</option>
-              <option value="name">{t('prospects.sortName')}</option>
-              <option value="status">{t('prospects.sortStatus')}</option>
-            </select>
-          </div>
-        )}
-
-        {viewMode === 'table' && (
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-muted/50 text-[11px] uppercase tracking-wider font-bold text-muted-foreground border-b border-border">
-                  <th className="px-6 py-3">{t('prospects.cabinet')}</th>
-                  <th className="px-6 py-3">{t('prospects.sector')}</th>
-                  <th className="px-6 py-3">{t('prospects.city')}</th>
-                  <th className="px-6 py-3">{t('prospects.phone')}</th>
-                  <th className="px-6 py-3">{t('prospects.status')}</th>
-                  <th className="px-6 py-3">{t('prospects.rating')}</th>
-                  <th className="px-6 py-3">{t('prospects.date')}</th>
-                  <th className="px-6 py-3 text-right">{t('prospects.actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filtered.map(p => (
-                  <tr key={p.id} className="hover:bg-muted/50 cursor-pointer transition-colors group" onClick={() => onSelect(p)}>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-semibold text-foreground">{p.name}</span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground">{p.sector}</td>
-                    <td className="px-6 py-4">
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground"><MapPin size={12} /> {p.city}</span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground font-mono">{p.phone || '—'}</td>
-                    <td className="px-6 py-4"><StatusBadge status={p.status} /></td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs font-mono font-bold text-amber-600">★ {p.rating || '—'}</span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground font-mono">{new Date(p.createdAt).toLocaleDateString(locale)}</td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {p.phone && (
-                          <a href={`tel:${p.phone}`} onClick={e => e.stopPropagation()} className="p-1.5 hover:bg-muted rounded-md text-muted-foreground" title={t('prospects.call')}>
-                            <Phone size={14} />
-                          </a>
-                        )}
-                        <a href={`sms:${p.phone}`} onClick={e => e.stopPropagation()} className="p-1.5 hover:bg-muted rounded-md text-muted-foreground" title="Message">
-                          <MessageSquare size={14} />
-                        </a>
-                        <ChevronRight size={16} className="text-muted-foreground" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Card view: always shown on mobile, toggle on desktop */}
-        {(viewMode === 'card' || true) && (
-          <div className={`p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
-            {filtered.map(p => (
-              <div key={p.id} onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all group">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-semibold text-foreground text-sm">{p.name}</h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><MapPin size={11} /> {p.city}</p>
-                  </div>
-                  <StatusBadge status={p.status} />
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{p.sector}</span>
-                  <span className="font-mono font-bold text-amber-600">★ {p.rating || '—'}</span>
-                </div>
-                {p.notes && <p className="text-xs text-muted-foreground mt-2 line-clamp-2 border-t border-border pt-2">{p.notes}</p>}
-                <div className="flex gap-2 mt-3 pt-2 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity">
-                  {p.phone && (
-                    <a href={`tel:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline">
-                      <Phone size={12} /> {t('prospects.call')}
-                    </a>
-                  )}
-                  <button onClick={e => { e.stopPropagation(); onUpdateStatus(p.id, 'CONTACTED'); }} className="text-xs text-status-contacted font-semibold hover:underline ml-auto">
-                    {t('prospects.contacted')}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {filtered.length === 0 && (
-          <div className="py-20 text-center">
-            <div className="inline-flex p-4 bg-muted rounded-full mb-4">
-              <Users size={32} className="text-muted-foreground/40" />
-            </div>
-            <h3 className="text-foreground font-semibold">{t('prospects.empty')}</h3>
-            <p className="text-muted-foreground text-sm mt-1">{t('prospects.emptyDesc')}</p>
-            <button onClick={onOpenAdd} className="mt-4 text-sm text-primary font-semibold hover:underline">{t('prospects.addFirst')}</button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-full transition-colors ${showFilters ? 'bg-primary text-primary-foreground border-primary' : 'text-muted-foreground border-border bg-card'}`}>
+            <Filter size={12} /> {t('prospects.filter')}
+          </button>
+          <button onClick={onExport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-muted-foreground border border-border bg-card rounded-full transition-colors">
+            <Download size={12} /> CSV
+          </button>
+          <div className="ml-auto text-xs text-muted-foreground self-center tabular-nums">{filtered.length} résultat{filtered.length > 1 ? 's' : ''}</div>
+        </div>
       </div>
+
+      {showFilters && (
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as ProspectStatus | '')} className="px-3 py-1.5 bg-card border border-border rounded-full text-xs text-foreground outline-none shrink-0">
+            <option value="">{t('prospects.allStatuses')}</option>
+            {(Object.keys(STATUSES) as ProspectStatus[]).map(key => (
+              <option key={key} value={key}>{t(`status.${key}` as any)}</option>
+            ))}
+          </select>
+          <select value={sectorFilter} onChange={e => setSectorFilter(e.target.value as Sector | '')} className="px-3 py-1.5 bg-card border border-border rounded-full text-xs text-foreground outline-none shrink-0">
+            <option value="">{t('prospects.allSectors')}</option>
+            {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as SortKey)} className="px-3 py-1.5 bg-card border border-border rounded-full text-xs text-foreground outline-none shrink-0">
+            <option value="date">{t('prospects.sortDate')}</option>
+            <option value="name">{t('prospects.sortName')}</option>
+            <option value="status">{t('prospects.sortStatus')}</option>
+          </select>
+        </div>
+      )}
+
+      {/* Cards */}
+      <div className="space-y-3">
+        {filtered.map(p => (
+          <div key={p.id} onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 active:bg-muted cursor-pointer transition-all">
+            <div className="flex justify-between items-start mb-2">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-foreground text-sm truncate">{p.name}</h3>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin size={11} /> {p.city}</p>
+              </div>
+              <StatusBadge status={p.status} />
+            </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>{p.sector}</span>
+              <span className="font-mono font-bold text-amber-600">★ {p.rating || '—'}</span>
+            </div>
+            {p.notes && <p className="text-xs text-muted-foreground mt-2 line-clamp-1 border-t border-border pt-2">{p.notes}</p>}
+            <div className="flex gap-3 mt-3 pt-2 border-t border-border">
+              {p.phone && (
+                <a href={`tel:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-primary font-semibold flex items-center gap-1 active:opacity-70">
+                  <Phone size={12} /> {t('prospects.call')}
+                </a>
+              )}
+              {p.phone && (
+                <a href={`sms:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-muted-foreground font-semibold flex items-center gap-1 active:opacity-70">
+                  <MessageSquare size={12} /> SMS
+                </a>
+              )}
+              <button onClick={e => { e.stopPropagation(); onUpdateStatus(p.id, 'CONTACTED'); }} className="text-xs text-status-contacted font-semibold active:opacity-70 ml-auto">
+                {t('prospects.contacted')}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="py-16 text-center">
+          <div className="inline-flex p-3 bg-muted rounded-full mb-3">
+            <Users size={28} className="text-muted-foreground/40" />
+          </div>
+          <h3 className="text-foreground font-semibold text-sm">{t('prospects.empty')}</h3>
+          <p className="text-muted-foreground text-xs mt-1">{t('prospects.emptyDesc')}</p>
+          <button onClick={onOpenAdd} className="mt-3 text-sm text-primary font-semibold active:opacity-70">{t('prospects.addFirst')}</button>
+        </div>
+      )}
     </div>
   );
 }
