@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, List, CalendarDays, Clock, MapPin, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, List, CalendarDays, Clock, MapPin, Trash2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Appointment {
   id: string;
@@ -47,7 +48,17 @@ export default function Appointments() {
     setAppointments((appts || []).map(a => ({ ...a, prospect_name: a.prospect_id ? prospectMap.get(a.prospect_id) : undefined })));
   }, [user]);
 
+  const { scheduleReminders } = useNotifications();
+
   useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  // Schedule push notifications for upcoming appointments
+  useEffect(() => {
+    if (appointments.length > 0) {
+      const upcoming = appointments.filter(a => new Date(a.date) > new Date());
+      scheduleReminders(upcoming);
+    }
+  }, [appointments, scheduleReminders]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
