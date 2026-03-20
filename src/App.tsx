@@ -22,7 +22,6 @@ function ProtectedApp() {
   const { prospects, addProspect, updateProspect, updateStatus, addActivity, exportToCSV } = useProspects();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('artisan_dark') === 'true');
 
   useEffect(() => {
@@ -36,16 +35,6 @@ function ProtectedApp() {
     document.documentElement.classList.toggle('dark', darkMode);
     localStorage.setItem('artisan_dark', String(darkMode));
   }, [darkMode]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'n' && !isModalOpen && !selectedProspect && (e.target as HTMLElement).tagName !== 'INPUT' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
-        setIsModalOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [isModalOpen, selectedProspect]);
 
   if (loading) {
     return (
@@ -62,30 +51,28 @@ function ProtectedApp() {
 
   return (
     <>
-      <div className="flex h-svh overflow-hidden">
-        <AppSidebar
-          signedCount={signedCount}
-          monthlyGoal={6}
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onSignOut={signOut}
-          userEmail={user.email}
-        />
-        <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
-          <div className="p-4 md:p-8 max-w-7xl mx-auto">
-            <Routes>
-              <Route path="/" element={<Dashboard prospects={prospects} onOpenAdd={() => setIsModalOpen(true)} />} />
-              <Route path="/prospects" element={
-                <Prospects prospects={prospects} onSelect={setSelectedProspect} onExport={exportToCSV} onOpenAdd={() => setIsModalOpen(true)} onUpdateStatus={updateStatus} />
-              } />
-              <Route path="/clients" element={<Clients clients={clients} />} />
-              <Route path="/rendez-vous" element={<Appointments />} />
-              <Route path="/parametres" element={<SettingsPage darkMode={darkMode} onToggleDark={() => setDarkMode(!darkMode)} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </main>
-      </div>
+      <AppSidebar
+        signedCount={signedCount}
+        monthlyGoal={6}
+        collapsed={false}
+        onToggle={() => {}}
+        onSignOut={signOut}
+        userEmail={user.email}
+      />
+      <main className="pt-14 pb-20 min-h-svh bg-background">
+        <div className="px-4 py-4 max-w-lg mx-auto">
+          <Routes>
+            <Route path="/" element={<Dashboard prospects={prospects} onOpenAdd={() => setIsModalOpen(true)} />} />
+            <Route path="/prospects" element={
+              <Prospects prospects={prospects} onSelect={setSelectedProspect} onExport={exportToCSV} onOpenAdd={() => setIsModalOpen(true)} onUpdateStatus={updateStatus} />
+            } />
+            <Route path="/clients" element={<Clients clients={clients} />} />
+            <Route path="/rendez-vous" element={<Appointments />} />
+            <Route path="/parametres" element={<SettingsPage darkMode={darkMode} onToggleDark={() => setDarkMode(!darkMode)} />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </main>
 
       {isModalOpen && <AddProspectModal onClose={() => setIsModalOpen(false)} onAdd={(data) => { addProspect(data); setIsModalOpen(false); }} />}
       {selectedProspect && (
