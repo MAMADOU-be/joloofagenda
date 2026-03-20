@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, List, CalendarDays, Clock, MapPin, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, List, CalendarDays, Clock, MapPin, Trash2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Appointment {
   id: string;
