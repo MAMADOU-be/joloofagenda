@@ -98,35 +98,40 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
       {/* Cards */}
       <div className="space-y-3">
         {filtered.map(p => (
-          <div key={p.id} onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 active:bg-muted cursor-pointer transition-all">
-            <div className="flex justify-between items-start mb-2">
-              <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-foreground text-sm truncate">{p.name}</h3>
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin size={11} /> {p.city}</p>
+          <SwipeableCard
+            key={p.id}
+            onSwipeRight={() => onUpdateStatus(p.id, 'CONTACTED')}
+            onSwipeLeft={() => onUpdateStatus(p.id, 'REFUSED')}
+            rightLabel={t('prospects.contacted')}
+            leftLabel="Refusé"
+          >
+            <div onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 active:bg-muted cursor-pointer transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-foreground text-sm truncate">{p.name}</h3>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin size={11} /> {p.city}</p>
+                </div>
+                <StatusBadge status={p.status} />
               </div>
-              <StatusBadge status={p.status} />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{p.sector}</span>
+                <span className="font-mono font-bold text-amber-600">★ {p.rating || '—'}</span>
+              </div>
+              {p.notes && <p className="text-xs text-muted-foreground mt-2 line-clamp-1 border-t border-border pt-2">{p.notes}</p>}
+              <div className="flex gap-3 mt-3 pt-2 border-t border-border">
+                {p.phone && (
+                  <a href={`tel:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-primary font-semibold flex items-center gap-1 active:opacity-70">
+                    <Phone size={12} /> {t('prospects.call')}
+                  </a>
+                )}
+                {p.phone && (
+                  <a href={`sms:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-muted-foreground font-semibold flex items-center gap-1 active:opacity-70">
+                    <MessageSquare size={12} /> SMS
+                  </a>
+                )}
+              </div>
             </div>
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{p.sector}</span>
-              <span className="font-mono font-bold text-amber-600">★ {p.rating || '—'}</span>
-            </div>
-            {p.notes && <p className="text-xs text-muted-foreground mt-2 line-clamp-1 border-t border-border pt-2">{p.notes}</p>}
-            <div className="flex gap-3 mt-3 pt-2 border-t border-border">
-              {p.phone && (
-                <a href={`tel:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-primary font-semibold flex items-center gap-1 active:opacity-70">
-                  <Phone size={12} /> {t('prospects.call')}
-                </a>
-              )}
-              {p.phone && (
-                <a href={`sms:${p.phone}`} onClick={e => e.stopPropagation()} className="text-xs text-muted-foreground font-semibold flex items-center gap-1 active:opacity-70">
-                  <MessageSquare size={12} /> SMS
-                </a>
-              )}
-              <button onClick={e => { e.stopPropagation(); onUpdateStatus(p.id, 'CONTACTED'); }} className="text-xs text-status-contacted font-semibold active:opacity-70 ml-auto">
-                {t('prospects.contacted')}
-              </button>
-            </div>
-          </div>
+          </SwipeableCard>
         ))}
       </div>
 
