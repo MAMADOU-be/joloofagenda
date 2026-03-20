@@ -154,8 +154,9 @@ export default function Prospects({ prospects, onSelect, onExport, onOpenAdd, on
           </div>
         )}
 
-        {viewMode === 'card' && (
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Card view: always shown on mobile, toggle on desktop */}
+        {(viewMode === 'card' || true) && (
+          <div className={`p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 ${viewMode === 'table' ? 'md:hidden' : ''}`}>
             {filtered.map(p => (
               <div key={p.id} onClick={() => onSelect(p)} className="bg-card border border-border rounded-xl p-4 hover:shadow-md cursor-pointer transition-all group">
                 <div className="flex justify-between items-start mb-3">
