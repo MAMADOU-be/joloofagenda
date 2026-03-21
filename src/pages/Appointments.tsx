@@ -45,7 +45,7 @@ export default function Appointments() {
   const [showAdd, setShowAdd] = useState(false);
   const [calMonth, setCalMonth] = useState(new Date());
 
-  const [form, setForm] = useState({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '' });
+  const [form, setForm] = useState({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '', reminder: '30' });
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
