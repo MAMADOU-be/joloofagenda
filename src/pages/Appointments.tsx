@@ -17,7 +17,7 @@ interface Appointment {
   status: string;
   prospect_id: string | null;
   prospect_name?: string;
-  reminder_minutes: number;
+  reminder_minutes?: number;
 }
 
 const REMINDER_OPTIONS = [
