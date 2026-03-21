@@ -67,7 +67,7 @@ export default function Appointments() {
   useEffect(() => {
     if (appointments.length > 0) {
       const upcoming = appointments.filter(a => new Date(a.date) > new Date());
-      scheduleReminders(upcoming);
+      scheduleReminders(upcoming.map(a => ({ ...a, reminder_minutes: a.reminder_minutes || 30 })));
     }
   }, [appointments, scheduleReminders]);
 
