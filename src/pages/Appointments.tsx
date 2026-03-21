@@ -167,6 +167,12 @@ export default function Appointments() {
               </div>
             </div>
             <div className="space-y-1">
+              <label className="text-xs font-medium text-foreground flex items-center gap-1"><Bell size={12} />Rappel</label>
+              <select value={form.reminder} onChange={e => setForm(f => ({ ...f, reminder: e.target.value }))} className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm">
+                {REMINDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
               <label className="text-xs font-medium text-foreground">Prospect lié</label>
               <select value={form.prospect_id} onChange={e => setForm(f => ({ ...f, prospect_id: e.target.value }))} className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm">
                 <option value="">— Aucun —</option>
