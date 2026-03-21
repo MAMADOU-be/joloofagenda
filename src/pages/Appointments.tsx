@@ -83,9 +83,10 @@ export default function Appointments() {
       duration_minutes: parseInt(form.duration),
       location: form.location,
       prospect_id: form.prospect_id || null,
+      reminder_minutes: parseInt(form.reminder),
     });
     if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
-    setForm({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '' });
+    setForm({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '', reminder: '30' });
     setShowAdd(false);
     fetchAll();
   };
