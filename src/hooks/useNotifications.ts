@@ -7,6 +7,7 @@ interface AppointmentForNotif {
   title: string;
   date: string;
   location: string;
+  reminder_minutes?: number;
 }
 
 export function useNotifications() {
