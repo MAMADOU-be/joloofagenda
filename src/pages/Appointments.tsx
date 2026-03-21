@@ -17,7 +17,18 @@ interface Appointment {
   status: string;
   prospect_id: string | null;
   prospect_name?: string;
+  reminder_minutes: number;
 }
+
+const REMINDER_OPTIONS = [
+  { value: '0', label: 'Aucun' },
+  { value: '1', label: '1 minute avant' },
+  { value: '5', label: '5 minutes avant' },
+  { value: '15', label: '15 minutes avant' },
+  { value: '30', label: '30 minutes avant' },
+  { value: '60', label: '1 heure avant' },
+  { value: '1440', label: '1 jour avant' },
+];
 
 interface Prospect {
   id: string;
