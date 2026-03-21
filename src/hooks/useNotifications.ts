@@ -7,6 +7,7 @@ interface AppointmentForNotif {
   title: string;
   date: string;
   location: string;
+  reminder_minutes?: number;
 }
 
 export function useNotifications() {
@@ -30,14 +31,22 @@ export function useNotifications() {
     const notifications = appointments
       .map((a, index) => {
         const apptTime = new Date(a.date).getTime();
-        const reminderTime = apptTime - 30 * 60 * 1000; // 30 min before
+        const delayMs = (a.reminder_minutes ?? 30) * 60 * 1000;
+        if (delayMs === 0) return null;
+        const reminderTime = apptTime - delayMs;
 
         if (reminderTime <= now) return null;
+
+        const delayLabel = (a.reminder_minutes ?? 30) >= 1440
+          ? `Dans ${Math.round((a.reminder_minutes ?? 30) / 1440)} jour(s)`
+          : (a.reminder_minutes ?? 30) >= 60
+            ? `Dans ${Math.round((a.reminder_minutes ?? 30) / 60)}h`
+            : `Dans ${a.reminder_minutes ?? 30} min`;
 
         return {
           id: index + 1,
           title: `Rappel : ${a.title}`,
-          body: a.location ? `Dans 30 min — ${a.location}` : 'Dans 30 minutes',
+          body: a.location ? `${delayLabel} — ${a.location}` : delayLabel,
           schedule: { at: new Date(reminderTime) },
           smallIcon: 'ic_stat_icon',
           iconColor: '#6366f1',

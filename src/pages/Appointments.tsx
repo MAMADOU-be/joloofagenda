@@ -17,7 +17,18 @@ interface Appointment {
   status: string;
   prospect_id: string | null;
   prospect_name?: string;
+  reminder_minutes?: number;
 }
+
+const REMINDER_OPTIONS = [
+  { value: '0', label: 'Aucun' },
+  { value: '1', label: '1 minute avant' },
+  { value: '5', label: '5 minutes avant' },
+  { value: '15', label: '15 minutes avant' },
+  { value: '30', label: '30 minutes avant' },
+  { value: '60', label: '1 heure avant' },
+  { value: '1440', label: '1 jour avant' },
+];
 
 interface Prospect {
   id: string;
@@ -34,7 +45,7 @@ export default function Appointments() {
   const [showAdd, setShowAdd] = useState(false);
   const [calMonth, setCalMonth] = useState(new Date());
 
-  const [form, setForm] = useState({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '' });
+  const [form, setForm] = useState({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '', reminder: '30' });
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
@@ -56,7 +67,7 @@ export default function Appointments() {
   useEffect(() => {
     if (appointments.length > 0) {
       const upcoming = appointments.filter(a => new Date(a.date) > new Date());
-      scheduleReminders(upcoming);
+      scheduleReminders(upcoming.map(a => ({ ...a, reminder_minutes: a.reminder_minutes || 30 })));
     }
   }, [appointments, scheduleReminders]);
 
@@ -72,9 +83,10 @@ export default function Appointments() {
       duration_minutes: parseInt(form.duration),
       location: form.location,
       prospect_id: form.prospect_id || null,
+      reminder_minutes: parseInt(form.reminder),
     });
     if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
-    setForm({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '' });
+    setForm({ title: '', description: '', date: '', time: '09:00', duration: '30', location: '', prospect_id: '', reminder: '30' });
     setShowAdd(false);
     fetchAll();
   };
@@ -153,6 +165,12 @@ export default function Appointments() {
                 <label className="text-xs font-medium text-foreground">Lieu</label>
                 <Input value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} className="h-11" />
               </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-foreground flex items-center gap-1"><Bell size={12} />Rappel</label>
+              <select value={form.reminder} onChange={e => setForm(f => ({ ...f, reminder: e.target.value }))} className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm">
+                {REMINDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-foreground">Prospect lié</label>

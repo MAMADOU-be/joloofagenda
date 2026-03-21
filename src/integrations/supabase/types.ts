@@ -58,6 +58,7 @@ export type Database = {
           id: string
           location: string
           prospect_id: string | null
+          reminder_minutes: number
           status: string
           title: string
           updated_at: string
@@ -71,6 +72,7 @@ export type Database = {
           id?: string
           location?: string
           prospect_id?: string | null
+          reminder_minutes?: number
           status?: string
           title: string
           updated_at?: string
@@ -84,6 +86,7 @@ export type Database = {
           id?: string
           location?: string
           prospect_id?: string | null
+          reminder_minutes?: number
           status?: string
           title?: string
           updated_at?: string
